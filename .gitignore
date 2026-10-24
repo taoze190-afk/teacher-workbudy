@@ -2,6 +2,7 @@ node_modules/
 .next/
 out/
 build/
+.tmp/
 *.zip
 *.dshbak
 *.tsbuildinfo

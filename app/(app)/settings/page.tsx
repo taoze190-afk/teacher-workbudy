@@ -177,7 +177,7 @@ export default function SettingsPage() {
         <p className="text-xs leading-6 text-slate-400">
           班主任工作台 v0.1 · Next.js + Tailwind + ECharts（数据本地存储）
           <br />
-          数据私有 · 设计文档见 banzhuren-system/docs
+          数据私有 · 设计文档见 design-docs/
         </p>
       </Card>
     </div>

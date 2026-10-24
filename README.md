@@ -102,8 +102,8 @@ lib/local.ts       # 本地持久化：IndexedDB 快照 + 本机账号（PBKDF2�
 lib/demo.ts        # 演示模式：同一引擎 + 内存示例数据
 ```
 
-`banzhuren-system/` 目录保存了设计文档（功能规格、数据库设计、成绩分析、安全设计），
-其中 `supabase/schema.sql` 可作为**数据模型参考** —— 开源版本的数据层已改为上述本地实现，不再依赖 Supabase。
+`design-docs/` 目录保存了设计文档（功能规格、数据库设计、成绩分析、安全设计），
+其中 `design-docs/supabase/schema.sql` 可作为**数据模型参考** —— 开源版本的数据层已改为上述本地实现，不再依赖 Supabase。
 
 ## 🛠️ 常用脚本
 

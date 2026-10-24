@@ -1,4 +1,4 @@
-// 与 supabase/schema.sql 对应的实体类型（按需使用，查询结果建议二次断言）
+// 与 design-docs/supabase/schema.sql 对应的实体类型（按需使用，查询结果建议二次断言）
 
 export interface Profile {
   user_id: string;

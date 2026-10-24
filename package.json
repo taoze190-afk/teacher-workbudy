@@ -11,22 +11,25 @@
     "icons": "node scripts/gen-pwa-icons.mjs"
   },
   "dependencies": {
-    "echarts": "^5.5.1",
+    "echarts": "^6.1.0",
     "lucide-react": "^0.441.0",
-    "next": "14.2.15",
+    "next": "^14.2.35",
     "pptxgenjs": "^3.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tesseract.js": "^7.0.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "file:vendor/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.31",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "image-size": "^2.0.4"
   }
 }

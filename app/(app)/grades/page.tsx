@@ -424,7 +424,7 @@ export default function GradesPage() {
       <Confirm
         open={confirmClear}
         title="清空本场考试成绩"
-        message="确定清空本场考试的**全部**成绩吗？所有学生的各科分数都会被删除（考试本身保留，可重新录入/导入）。此操作不可撤销。"
+        message="确定清空本场考试的全部成绩吗？所有学生的各科分数都会被删除（考试本身保留，可重新录入或导入）。此操作不可撤销。"
         danger
         onCancel={() => setConfirmClear(false)}
         onConfirm={clearExamGrades}

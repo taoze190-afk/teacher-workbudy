@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+build/
+*.zip
+*.dshbak
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+npm-debug.log*

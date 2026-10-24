@@ -1,0 +1,12 @@
+services:
+  banzhuren:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: banzhuren-app:latest
+    container_name: banzhuren-app
+    restart: always
+    ports:
+      - "3100:3000"
+    environment:
+      - NODE_ENV=production

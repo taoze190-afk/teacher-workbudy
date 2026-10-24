@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+.git
+.gitignore
+npm-debug.log
+README.md
+示例文件
+scripts
+tsconfig.tsbuildinfo
+*.zip
+*.dshbak

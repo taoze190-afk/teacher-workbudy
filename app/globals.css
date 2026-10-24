@@ -1,0 +1,505 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply text-slate-200 antialiased;
+  background: var(--app-bg);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ---------- 深色层级与对比度（参照 DeepSeek 深色模式：中性灰、靠色差与细描边分层） ----------
+   分层原则「越上层越亮」：底版 < 卡片 < 浮层（下拉/弹窗/输入）
+   次级文字保持 WCAG AA（≥4.5:1），低光下也能看清 */
+:root {
+  --app-bg: #1a1a1a;   /* 底版 */
+  --raise-1: #212121;  /* 卡片层 */
+  --raise-2: #2a2a2a;  /* 浮层 */
+}
+
+.bg-slate-800 {
+  background-color: var(--raise-1);
+}
+.bg-slate-800\/85 {
+  background-color: rgb(33 33 33 / 0.9);
+}
+/* 悬停底色统一用低透明度白色（DeepSeek 的做法），比蓝灰更中性 */
+.bg-slate-800\/60 {
+  background-color: rgb(255 255 255 / 0.055);
+}
+.bg-slate-700\/60 {
+  background-color: rgb(255 255 255 / 0.09);
+}
+/* 输入框下沉：比卡片略暗，明确“可填写”的信号 */
+.bg-slate-900\/50 {
+  background-color: rgb(0 0 0 / 0.28);
+}
+.text-slate-500 {
+  color: #8b8b8b;
+}
+.text-slate-400 {
+  color: #a3a3a3;
+}
+.divide-slate-50 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(255 255 255 / 0.08);
+}
+.border-slate-50 {
+  border-color: rgb(255 255 255 / 0.08);
+}
+/* 卡片描边：极淡的白色细线，仿 DeepSeek 的 1px 分隔 */
+.border-slate-700\/70 {
+  border-color: rgb(255 255 255 / 0.08);
+}
+/* 顶栏与侧栏的分割线再淡一档：这两条线横贯整个界面，稍深一点就会把版面
+   切成三块、显得生硬。这里靠背景色差分层，线只做极轻的暗示。
+   注意不要动 .border-slate-700（无透明度）—— 输入框靠它才有可见边界。 */
+.border-slate-700\/60 {
+  border-color: rgb(255 255 255 / 0.055);
+}
+/* 密集表格的斑马纹与行底线（成绩录入等）：用极淡的一行一色替代列间竖线，
+   引导视线横向阅读，也避免一堆输入框看起来像"拼起来的格子" */
+.bg-slate-800\/50 {
+  background-color: rgb(255 255 255 / 0.022);
+}
+.border-slate-700\/30 {
+  border-color: rgb(255 255 255 / 0.035);
+}
+
+/* 隐藏滚动条：滚轮/触屏仍可正常滚动，界面更干净 */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+* {
+  scrollbar-width: none; /* Firefox */
+}
+
+::selection {
+  background: rgba(77, 107, 254, 0.35);
+}
+
+/* ---------- 顶栏 / 底部导航：不画实线，改用色差 + 极淡投影分层 ----------
+   1px 的实线会横贯整个屏幕宽度，无论多淡都会被眼睛捕捉成"版面被切开"；
+   投影是渐变的，视觉上柔和得多，同时滚动时仍能提示"下面还有内容"。 */
+.app-topbar {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.04),
+    0 10px 24px -18px rgb(0 0 0 / 0.6);
+}
+html.light .app-topbar {
+  box-shadow:
+    0 1px 0 rgb(15 23 42 / 0.025),
+    0 10px 24px -20px rgb(15 23 42 / 0.12);
+}
+.app-bottombar {
+  box-shadow:
+    0 -1px 0 rgb(255 255 255 / 0.04),
+    0 -10px 24px -18px rgb(0 0 0 / 0.6);
+}
+html.light .app-bottombar {
+  box-shadow:
+    0 -1px 0 rgb(15 23 42 / 0.025),
+    0 -10px 24px -20px rgb(15 23 42 / 0.12);
+}
+
+/* ---------- 动效 ---------- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 页面/卡片进入动画 */
+/* 注意：不能用 fill-mode both/forwards——动画结束后残留的 transform 会把
+   fixed 定位后代（弹窗/水印）的包含块从视口改成内容区，导致弹窗错位溢出 */
+.page-enter {
+  animation: fade-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stagger > * {
+  animation: fade-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.stagger > *:nth-child(3) { animation-delay: 0.08s; }
+.stagger > *:nth-child(4) { animation-delay: 0.11s; }
+.stagger > *:nth-child(5) { animation-delay: 0.14s; }
+.stagger > *:nth-child(6) { animation-delay: 0.17s; }
+.stagger > *:nth-child(7) { animation-delay: 0.2s; }
+.stagger > *:nth-child(8) { animation-delay: 0.23s; }
+
+.modal-panel {
+  animation: pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.backdrop-in {
+  animation: fade-in 0.18s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  .stagger > *,
+  .modal-panel,
+  .backdrop-in {
+    animation: none !important;
+  }
+}
+
+/* ---------- 浅色主题覆盖（html.light 时把深色类映射为浅色值） ---------- */
+:root {
+  color-scheme: dark;
+}
+html.light {
+  color-scheme: light;
+}
+html.light body {
+  background: #f9fafb !important;
+  color: #111827 !important;
+}
+/* 卡片纯白、页面浅灰：DeepSeek 浅色的基本层次 */
+html.light .bg-slate-800 {
+  background-color: #ffffff;
+}
+html.light .bg-slate-800\/60 {
+  background-color: #f3f4f6;
+}
+html.light .bg-slate-800\/85 {
+  background-color: rgb(255 255 255 / 0.88);
+}
+html.light .bg-slate-900,
+html.light .bg-slate-900\/85 {
+  background-color: #f9fafb;
+}
+html.light .bg-slate-700,
+html.light .bg-slate-700\/60 {
+  background-color: #f3f4f6;
+}
+html.light .bg-slate-900\/50 {
+  background-color: #ffffff;
+}
+/* 补漏：这几个透明度变体之前没有映射，浅色主题下会保持深色底，
+   而文字色却被映射成近黑色 —— 结果是「深底 + 黑字」，内容直接看不见 */
+html.light .bg-slate-900\/40,
+html.light .bg-slate-900\/30,
+html.light .bg-slate-900\/20,
+html.light .bg-slate-800\/40,
+html.light .bg-slate-800\/30,
+html.light .bg-slate-800\/20 {
+  background-color: #f9fafb;
+}
+html.light .bg-slate-800\/95,
+html.light .bg-slate-900\/95 {
+  background-color: rgb(255 255 255 / 0.95);
+}
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #111827;
+}
+html.light .text-slate-300 {
+  color: #374151;
+}
+html.light .text-slate-400 {
+  color: #6b7280;
+}
+html.light .text-slate-500 {
+  color: #9ca3af;
+}
+/* 品牌色在浅色底上统一用主蓝，浅色档（brand-300/400）在白底上几乎看不见 */
+html.light .text-brand-100,
+html.light .text-brand-200,
+html.light .text-brand-300,
+html.light .text-brand-400 {
+  color: #4d6bfe;
+}
+/* 输入框等需要清晰边界，保持原值 */
+html.light .border-slate-700 {
+  border-color: #e5e7eb;
+}
+/* 顶栏 / 侧栏 / 卡片的分割线：比输入框边框淡一档，避免把版面切成几块 */
+html.light .border-slate-700\/60,
+html.light .border-slate-700\/70 {
+  border-color: #eef1f5;
+}
+/* 密集表格：浅色下斑马纹要比卡片白再深一点点，行底线极淡 */
+html.light .bg-slate-800\/50 {
+  background-color: #fafbfc;
+}
+html.light .border-slate-700\/30 {
+  border-color: #f1f4f7;
+}
+html.light .border-slate-600 {
+  border-color: #d1d5db;
+}
+html.light .hover\:bg-slate-700\/60:hover,
+html.light .hover\:bg-slate-600\/60:hover {
+  background-color: #f3f4f6;
+}
+/* 悬浮态补齐：深色主题的 hover 底色/文字色若不映射，浅色下会出现
+   「深色色块盖住深字」「白字浮在白底上」的不可读状态 */
+html.light .hover\:bg-slate-800\/60:hover {
+  background-color: #f3f4f6;
+}
+html.light .hover\:bg-slate-700:hover,
+html.light .hover\:bg-slate-900:hover,
+html.light .active\:bg-slate-600:active {
+  background-color: #f3f4f6;
+}
+html.light .hover\:bg-white\/10:hover {
+  background-color: rgb(17 24 39 / 0.06);
+}
+html.light .hover\:text-slate-200:hover,
+html.light .hover\:text-slate-100:hover,
+html.light .group-hover\:text-slate-100:hover {
+  color: #111827;
+}
+html.light .hover\:text-slate-400:hover {
+  color: #4b5563;
+}
+html.light .hover\:text-brand-300:hover,
+html.light .hover\:text-brand-200:hover,
+html.light .hover\:text-brand-400:hover {
+  color: #4d6bfe;
+}
+html.light .hover\:text-emerald-300:hover {
+  color: #15803d;
+}
+html.light .hover\:text-rose-400:hover,
+html.light .hover\:text-red-400:hover {
+  color: #b91c1c;
+}
+html.light .hover\:text-amber-500:hover {
+  color: #b45309;
+}
+/* 分隔线在浅色下恢复可见 */
+html.light .divide-slate-50 > :not([hidden]) ~ :not([hidden]),
+html.light .border-slate-50 {
+  border-color: #e5e7eb;
+}
+html.light .hover\:bg-slate-700\/40:hover {
+  background-color: #f3f4f6;
+}
+html.light .hover\:bg-slate-50:hover {
+  background-color: #f9fafb;
+}
+/* 状态色在浅色下加深，保证白底上的对比度 */
+html.light .bg-brand-500\/15,
+html.light .bg-brand-500\/20 {
+  background-color: #eef2ff;
+}
+html.light .text-green-300 {
+  color: #15803d;
+}
+html.light .text-red-300 {
+  color: #b91c1c;
+}
+html.light .text-amber-300 {
+  color: #b45309;
+}
+html.light .text-blue-300 {
+  color: #1d4ed8;
+}
+html.light .text-orange-300 {
+  color: #c2410c;
+}
+html.light .text-teal-300 {
+  color: #0f766e;
+}
+
+/* 打印预览：屏幕上也保持白纸观感（所见即所得） */
+.print-area {
+  background: #ffffff !important;
+  color: #1e293b !important;
+}
+/* 排除 no-print 元素（如打印按钮），否则深色按钮会被强制深字变成“隐形按钮” */
+.print-area *:not(.no-print):not(.no-print *) {
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* 打印（深色主题下打印保持白底黑字） */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    display: block !important;
+  }
+  body {
+    background: white !important;
+    color: #1e293b !important;
+  }
+  .print-area,
+  .print-area * {
+    background: white !important;
+    color: #1e293b !important;
+    border-color: #cbd5e1 !important;
+  }
+  /* 奖状：一张不跨页断裂；边框单独加深（上面的通配规则会把它刷成浅灰） */
+  .award-frame {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .print-area .award-frame {
+    border-color: #64748b !important;
+  }
+}
+
+/* ---------- 浅色主题补充覆盖 ----------
+   强制只保留浅色后，这些类之前没被映射，会出现「与白底几乎同色、看不出分组」
+   或对比度不足的情况。 */
+html.light .bg-stone-50 {
+  /* 课表的节次列：原值 #fafaf9 在白卡片上完全看不出分组，改成明确的浅灰 */
+  background-color: #f3f4f6;
+}
+html.light .bg-brand-500\/5,
+html.light .bg-brand-500\/10,
+html.light .bg-brand-500\/25 {
+  background-color: #eef2ff;
+}
+html.light .bg-slate-400\/15,
+html.light .bg-slate-500\/15 {
+  background-color: #eef1f4;
+}
+html.light .bg-slate-300,
+html.light .bg-slate-400,
+html.light .bg-slate-500 {
+  background-color: #e5e7eb;
+}
+html.light .hover\:bg-brand-500\/10:hover,
+html.light .hover\:bg-brand-500\/25:hover {
+  background-color: #e0e7ff;
+}
+html.light .text-slate-600 {
+  color: #6b7280;
+}
+html.light .text-brand-200\/80,
+html.light .text-brand-300\/80,
+html.light .text-brand-300\/90 {
+  color: #4d6bfe;
+}
+
+/* ---------- 打印：只留材料正文与标题 ----------
+   逐页给筛选器/按钮加 no-print 太容易漏，这里反过来做：
+   打印时隐藏所有界面控件（按钮、输入框、下拉框），正文（标题/表格/文字）保留。
+   材料区域（.print-area，如课表、打印中心）里的控件是内容的一部分，要保留。 */
+@media print {
+  button,
+  input,
+  select,
+  textarea {
+    display: none !important;
+  }
+  .print-area button,
+  .print-area input,
+  .print-area select,
+  .print-area textarea {
+    display: revert !important;
+  }
+  /* 弹窗、提示条、浮层一律不打印 */
+  [role='dialog'],
+  [aria-hidden='true'] {
+    display: none !important;
+  }
+}
+
+/* 修正：材料区域内的「导出 / 打印 / 关闭」这类按钮本身仍要隐藏 ——
+   上面的 .print-area button { display: revert } 特异性比 .no-print 高，
+   不加这条的话，材料里的按钮会被"救回来"一起打印出来。 */
+@media print {
+  .print-area .no-print,
+  .print-area button.no-print,
+  .print-area input.no-print,
+  .print-area select.no-print {
+    display: none !important;
+  }
+}
+
+/* ---------- 打印方向控制与内容自适应 ----------
+   1) 课表页有两张表（班级课表 / 我的周课表），点哪个按钮就只打印哪一张
+   2) 屏幕上为了铺满视口用了 min-h-screen、h-[calc(100vh-...)]，打印时会撑出整页空白，
+      这里一律放开高度，让内容按实际大小自然排布 */
+@media print {
+  body[data-print='class'] .print-area--mine,
+  body[data-print='mine'] .print-area--class {
+    display: none !important;
+  }
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .min-h-screen {
+    min-height: 0 !important;
+  }
+  .pb-16 {
+    padding-bottom: 0 !important;
+  }
+}
+
+
+/* ---------- 我的周课表：打印时压紧，尽量放进一页 ----------
+   屏幕上为了好点按，格子给了 h-11(44px) 和较宽的内边距；
+   纸上不需要那么大，压到约 16px 一行，整张表 + 标题一页就够。 */
+@media print {
+  .print-compact table {
+    font-size: 10px;
+  }
+  .print-compact th,
+  .print-compact td {
+    height: auto !important;
+    padding: 1px 3px !important;
+    line-height: 1.25 !important;
+  }
+  .print-compact h3 {
+    margin-bottom: 4px !important;
+    font-size: 12px !important;
+  }
+  .print-compact .no-print {
+    display: none !important;
+  }
+}
+
+/* 修正：上一版压到 10px 字 + 1px 内边距，打印出来太小。
+   放宽到 12px 字 / 34px 行高 —— 15 行约 510px，A4 一页（约 1123px）依然放得下。 */
+@media print {
+  .print-compact table {
+    font-size: 12px;
+  }
+  .print-compact th,
+  .print-compact td {
+    height: 34px !important;
+    padding: 4px 6px !important;
+    line-height: 1.35 !important;
+  }
+  .print-compact h3 {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+  }
+}

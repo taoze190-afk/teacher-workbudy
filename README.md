@@ -1,155 +1,152 @@
 # 班主任工作台
 
-初中班主任用的班级管理工具：学生档案、考勤、作业、值日、成绩分析、评语、打印。26 个功能模块，手机、iPad、电脑都能用，添加到主屏幕就是一个 App。
+**从每日考勤到期末评语，把班级事务留在一个工作台。**
 
-数据只存在你自己浏览器的 IndexedDB 里。不注册云服务，不配数据库，clone 下来装完依赖就能用。
+面向初中班主任与任课教师的本地优先班级管理应用。以学生档案为中心，连接考勤、作业、成长记录、成绩分析、家校联系与备课，覆盖 26 个功能模块，适配电脑、平板和手机浏览器。
 
-技术栈：Next.js 14（App Router，构建成纯静态文件）、TypeScript、Tailwind CSS、ECharts、SheetJS。
+业务记录保存在当前浏览器的 IndexedDB 中，基础使用无需配置云账号或数据库。可部署为静态网站，也可通过 Docker 运行；AI 辅助需要按需配置接口与模型。
 
-## 功能与路由
+[部署指南](DEPLOY.md) · [安全说明](SECURITY.md) · [问题反馈](https://github.com/taoze190-afk/teacher-workbudy/issues) · [MIT 许可证](LICENSE)
 
-| 模块 | 路由 | 说明 |
-|---|---|---|
-| 今日看板 | `/dashboard` | 当天的考勤异常、未交作业、到期跟进、待办、值日、生日 |
-| 学生档案 | `/students`、`/students/detail` | 增删改查、搜索筛选、每个学生的成长时间线；转出用软删除 |
-| 座位 | `/seating` | 桌面拖拽、触屏点选放置，支持锁定、轮换、男女交替，座位图导出 PNG |
-| 我的课表 | `/schedule` | 周课表编辑与打印 |
-| 考勤 | `/attendance` | 按节点考勤或每日总考勤，请假审批通过后自动生成记录，按月汇总 |
-| 值日 | `/duty` | 自动均分、每周轮换、每日检查记录 |
-| 作业 | `/homework` | 默认全员已交，点一下改成未交，可导出未交名单 |
-| 课堂工具 | `/tools` | 随机点名，当天不重复 |
-| 事件台账 | `/events` | 表扬、违纪、冲突、意外，记严重度与处理状态，生成家长通知文案 |
-| 谈心谈话 | `/talks` | 结构化记录、跟进日期、逾期提醒 |
-| 重点关注 | `/focus` | 红黄台账，进页面要 PIN，级别变更留日志 |
-| 重点学生汇总 | `/focus-summary` | 健康、心理、家庭三类台账汇总 |
-| 考试管理 | `/exams` | 建考试，每科满分单独设 |
-| 成绩 | `/grades` | 五个页签：录入、排名、分析、临界生、分析报告 |
-| 学习小组 | `/groups` | 分组，每组第一位是组长 |
-| 家校联系 | `/contacts` | 电话、微信、面谈、家访记录，逾期提醒 |
-| 家长会 | `/meetings` | 会议记录，预生成签到名单 |
-| 班委 | `/leaders` | 按学期任命与解除 |
-| 活动 | `/activities` | 活动记录与荣誉 |
-| 评语 | `/reports` | 用平时记录生成评语草稿，另有评语素材库 |
-| 备课教案 | `/lesson-prep` | 教案结构化编辑，可导出 PPT |
-| 课堂 | `/classroom` | 课堂资源留档，可生成 OpenMAIC 的课堂提示词 |
-| 导入中心 | `/import` | 名单、成绩宽表、问卷星导出表、课表：下载模板、识别表头同义词、预览纠错，重复导出不产生脏数据 |
-| 打印中心 | `/print` | 座位表、成绩条、考勤汇总、家长会签到表、值日表，A4 打印或存 PDF |
-| 安全中心 | `/security` | 审计日志、加密备份、应用锁 PIN、水印开关 |
-| 设置 | `/settings` | 手机号打码开关、座位行列、AI 评语配置、家长告知文案复制 |
+## 适合怎样使用
 
-另有 `/login` 登录页、`/reset-password` 兼容旧链接（进入即跳回登录）、`/` 按登录状态跳转到看板或登录页。
+- **开始带班**：建立班级，导入名单，整理学生档案、座位和值日安排。
+- **处理日常事务**：从今日看板进入考勤、作业与待跟进事项，把事件和谈话记录挂到学生名下。
+- **跟进学生成长**：结合成绩、谈话、家校联系和活动记录，形成连续的学生成长时间线。
+- **整理学期材料**：生成评语草稿、分析成绩，集中打印成绩条、考勤汇总和家长会签到表。
 
-## 开始使用
+当前版本适合个人在固定浏览器中管理班级，不提供学校级多人协作、云端账号管理或跨设备自动同步。
+
+## 功能概览
+
+| 工作场景 | 已有功能 |
+| --- | --- |
+| 班级组织 | 多班级切换、学生档案、成长时间线、座位编排与轮换、周课表 |
+| 每日事务 | 今日看板、考勤与请假、作业收交、值日检查、随机点名、事件台账 |
+| 学生成长 | 谈心谈话、重点关注与汇总、家校联系、家长会、班委任命、活动与荣誉 |
+| 成绩与评价 | 考试管理、成绩录入、排名与统计、临界生分析、学习小组、评语草稿与素材库 |
+| 备课与课堂 | 结构化教案、PPT 导出、课堂资源留档、OpenMAIC 课堂提示词生成 |
+| 导入与归档 | Excel 模板与导入预览、问卷表解析、A4 打印、加密备份导出、审计日志、PIN 应用锁 |
+
+<details>
+<summary>查看全部 26 个模块与路由</summary>
+
+| 模块 | 路由 | 主要用途 |
+| --- | --- | --- |
+| 今日看板 | `/dashboard` | 查看考勤异常、未交作业、待办、到期跟进与当日值日 |
+| 学生档案 | `/students` | 搜索与维护学生信息，查看个人详情和成长时间线 |
+| 座位 | `/seating` | 拖拽或触屏排座、锁定与轮换，导出 PNG 座位图 |
+| 我的课表 | `/schedule` | 编辑与打印周课表 |
+| 考勤 | `/attendance` | 节点或每日考勤、请假审批、月度汇总 |
+| 值日 | `/duty` | 均分任务、每周轮换与每日检查 |
+| 作业 | `/homework` | 标记未交作业，导出未交名单 |
+| 课堂工具 | `/tools` | 随机点名，当日去重 |
+| 事件台账 | `/events` | 记录表扬、违纪、冲突与意外，跟进处理状态 |
+| 谈心谈话 | `/talks` | 结构化谈话记录、跟进日期与逾期提醒 |
+| 重点关注 | `/focus` | 红黄关注台账、PIN 访问与级别变更日志 |
+| 重点学生汇总 | `/focus-summary` | 汇总健康、心理与家庭相关记录 |
+| 家校联系 | `/contacts` | 电话、微信、面谈与家访记录，设置后续跟进 |
+| 家长会 | `/meetings` | 会议记录与签到名单 |
+| 班委 | `/leaders` | 按学期任命与解除班委 |
+| 活动 | `/activities` | 归档班级活动与荣誉 |
+| 考试管理 | `/exams` | 建立考试，逐科设置满分 |
+| 成绩分析 | `/grades` | 录入、排名、统计分析、临界生与分析报告 |
+| 学习小组 | `/groups` | 学生分组与组长安排 |
+| 评语 | `/reports` | 结合日常记录生成草稿，维护评语素材 |
+| 备课教案 | `/lesson-prep` | 编辑教案，导出 PPT，可选 AI 辅助 |
+| 课堂 | `/classroom` | 留存课堂资源，生成供 OpenMAIC 使用的提示词 |
+| 导入中心 | `/import` | 名单、成绩、问卷与课表导入，模板下载与预览纠错 |
+| 打印中心 | `/print` | 座位表、成绩条、考勤汇总、签到表与值日表 |
+| 安全中心 | `/security` | 审计日志、加密备份导出、PIN 与水印设置 |
+| 设置 | `/settings` | 手机号显示偏好、座位网格、备份提醒与 AI 配置 |
+
+学生详情入口为 `/students/detail`；`/login` 用于本机账号登录。`/` 会按登录状态跳转，`/reset-password` 为兼容旧链接而保留，跳转回登录页。
+
+</details>
+
+## 快速开始
+
+需要 Node.js 与 npm。当前锁定的 Next.js 版本要求 Node.js ≥ 18.17；部署镜像使用 Node.js 20，详见 [Dockerfile](Dockerfile)。
 
 ```bash
 git clone https://github.com/taoze190-afk/teacher-workbudy.git
 cd teacher-workbudy
-npm install
-npm run dev              # http://localhost:3000
+npm ci
+npm run dev
 ```
 
-首次打开是登录页。这里的账号只用来锁住你本机数据，用户名和密码都存在这台设备的浏览器里，不发送到任何地方。
+打开 <http://localhost:3000>，按以下顺序初始化：
 
-登录后先在设置页建班级，再到导入中心下载模板、导入学生名单。
+1. 在登录页创建本机账号，设置用户名与密码。
+2. 点击顶栏或空白页提示中的「创建班级」，填写班级信息。
+3. 进入「导入中心」，下载模板并导入学生名单，确认预览中的字段和异常行。
+4. 按需维护课表、座位、值日和考试，从「今日看板」处理日常事务。
+5. 在「安全中心」设置 PIN，并定期导出加密备份；照片等附件另行保留原件。
 
-想先看看功能，登录页有演示模式：一套虚构班级数据，不落盘、不联网，退出即清空。
+登录页另有演示模式，用于查看功能。演示业务记录保存在内存中，不写入正式业务数据库。
 
-## 目录结构
+## 数据保存与联网范围
 
-```
-app/                      页面（App Router，一个目录一个页面）
-  (app)/                  登录后的 26 个模块，共用 AppShell 的导航与顶栏
-  login/                  本机账号登录、演示模式入口
-  page.tsx                按登录状态跳 /dashboard 或 /login
-  reset-password/         兼容旧链接，进入即跳回登录页
-  layout.tsx              根布局：水印、应用锁、Service Worker 注册
-  manifest.ts             PWA 清单（图标与截图声明）
-  globals.css             Tailwind 入口与全局样式
+| 内容 | 当前实现 |
+| --- | --- |
+| 业务记录与照片 | 保存在当前站点、当前浏览器的 IndexedDB；部署网站不会自动汇集各设备的数据 |
+| 本机账号 | 账号信息与带盐 PBKDF2-SHA256 密码哈希保存在本机；不保存明文登录密码 |
+| PIN 与水印 | 用于界面访问和显示控制，不代表 IndexedDB 中的数据已全盘加密 |
+| Excel / 问卷导入 | 在浏览器中解析；问卷身份证字段用于提取生日、校验性别后不入库 |
+| AI 辅助 | 需要自行配置兼容接口地址、密钥与模型；生成时会把提示词及其中引用的学生或教案内容发送到该接口 |
+| 请假条 OCR | 在浏览器识别图片；首次使用可能联网下载识别模型 |
+| 加密备份 | 导出 AES-GCM 加密的 `.dshbak` 文件，内容为业务表快照；不包含单独存储的照片附件和本机配置 |
 
-components/
-  AppShell.tsx            侧栏与抽屉导航、顶栏；⌘K / Ctrl+K 打开命令面板
-  CommandPalette.tsx      全局搜索跳转
-  AppLockGate.tsx         敏感页的 PIN 锁外壳
-  Watermark.tsx           半透明斜纹水印层，开关在设置页
-  ImportFlow.tsx          导入中心的完整流程：模板 → 解析 → 预览纠错 → 写入
-  ImportDialog.tsx        学生页、成绩页里就地调用的导入弹窗
-  SurveyImport.tsx        新生调查表导入界面
-  Chart.tsx               ECharts 封装，亮/暗两套主题在组件内注册
-  PwaRegister.tsx         注册 Service Worker
-  ui.tsx                  基础控件：Button、Card、Field、Input、Modal、Confirm 等
-  grades/                 成绩页四个面板：排名、分析、临界生、分析报告（录入直接在页面里）
+AI 配置保存在本机 `localStorage`，调用接口时会使用所填密钥。生成的评语与教案应由教师核对后使用。
 
-lib/
-  supabase.ts             数据层门面，全站唯一入口。名字是早期遗留，实现已是本地
-  local-core.ts           查询引擎：from / eq / insert / update / upsert / rpc 与视图
-  local.ts                IndexedDB 快照、本机账号（PBKDF2）、附件存取
-  demo.ts                 演示模式的数据集，复用同一套引擎
-  importer.ts             Excel 解析：表头同义词、逐行校验、身份证号即取即弃
-  survey.ts               问卷星原始导出表解析
-  crypto.ts               加密备份：AES-GCM，密钥由用户口令派生
-  ai.ts                   AI 评语草稿，走 OpenAI 兼容接口，密钥只存本机
-  ocr.ts                  请假条拍照识字（tesseract.js 中文模型）
-  rank.ts                 名次算法。成绩页与打印中心共用一份，避免两处口径不一致
-  lesson.ts               备课：预设课文、模板教案、AI 生成、PPT 导出
-  classroom-prompt.ts     把教案拼成 OpenMAIC 的课堂生成提示词
-  export-students.ts      学生档案导出成一张 Excel
-  constants.ts            导航表 NAV / NAV_GROUPS 与全局常量
-  types.ts                实体类型，与 design-docs/supabase/schema.sql 对应
-  chart-theme.ts          图表统一配色与字号
-  utils.ts                cn() 等小工具
-  node-stub.js            pptxgenjs 在浏览器用不到的 Node 内置模块空桩
-
-public/
-  icons/  favicon.ico     应用图标，由 npm run icons 生成
-  sw.js                   Service Worker。刻意不缓存页面与产物，见文件内说明
-  screenshots/            PWA 清单里声明的应用截图
-  classroom-assets/       演示模式引用的课堂示例（课件与交互页）
-
-示例文件/                  四个 xlsx 模板，数据全为虚构：52 人名单、期中成绩、课表、边界测试
-vendor/                   xlsx-0.20.3.tgz，SheetJS 官方修复版。npm 渠道的 0.18 有原型污染，故内置
-design-docs/              设计文档与早期数据模型，见 design-docs/README.md
-scripts/                  生成图标、生成示例数据、导入解析自测、静态预览、打包部署
-
-next.config.mjs           静态导出与 Node 服务的开关：BUILD_MODE=server 走 standalone
-Dockerfile                standalone 模式镜像，容器内 3000 端口
-docker-compose.yml        映射宿主 3100 端口
-DEPLOY.md                 部署说明
-SECURITY.md               安全政策与依赖告警的取舍说明
-```
-
-## 数据与隐私
-
-学生数据属于敏感个人信息，这个项目按「数据不出本机」的思路做：
-
-- 业务数据和学生照片都存在浏览器 IndexedDB，不上传任何服务器。
-- 登录口令只存 PBKDF2-SHA256 哈希，明文密码不落盘。重点关注、安全中心这类页面另有 PIN 锁。
-- 导入新生调查表时，身份证号只用来取生日和校验性别，解析完立即丢弃，不入库。
-- 问卷平台自带的序号、提交时间、来源、IP 等列自动跳过。
-- 打印输出可一键打码手机号，全屏水印可开关。
-- 安全中心可导出 AES-GCM 加密的 `.dshbak` 备份，换设备或清浏览器数据靠它迁移。
-- 登录、导入、删除、打印这类操作写入只追加的审计日志，可在安全中心自查。
-
-浏览器清理「站点数据」会把这个应用的本地数据一起删掉。建议每周从安全中心导出一份加密备份。
+浏览器清理站点数据、切换浏览器或更换网站域名后，不会自动找回原来的记录。当前界面提供备份导出，**尚未提供备份恢复向导**；请保存备份口令及重要材料的独立副本，跨设备迁移需要额外处理。
 
 ## 构建与部署
 
-```bash
-npm run build            # 纯静态产物在 out/，任意静态托管均可
-npm run preview          # 本地预览 out/
-docker compose up -d --build    # 改用 Node 服务方式运行，访问宿主 3100 端口
-```
-
-静态托管、1Panel、Nginx、GitHub Pages 的具体做法见 [DEPLOY.md](DEPLOY.md)。
-
-## 常用脚本
+### 静态网站
 
 ```bash
-npm run icons                          # 重新生成 PWA 图标
-node scripts/generate-demo-data.mjs    # 重新生成 示例文件/ 下的示例 Excel
-node scripts/test-import-parse.mjs     # 导入解析器自测
-npm run pack                           # 打包部署产物
+npm run build
+npm run preview
 ```
 
-## License
+构建目录为 `out/`，预览地址为 <http://localhost:4173>。将 `out/` 的内容部署到网站根路径即可，无需数据库服务。部署到子路径时，需要另行调整 Next.js 的路径配置。
 
-[MIT](LICENSE)
+```bash
+npm run pack
+```
+
+在构建后执行此命令，可生成用于上传部署的 `banzhuren-web.zip`。
+
+### Docker
+
+```bash
+docker compose up -d --build
+```
+
+打开 <http://localhost:3100>。Docker 使用 `BUILD_MODE=server` 构建 Next.js standalone 服务，业务数据仍保存在使用者的浏览器中。
+
+手机或平板可通过浏览器的添加到主屏幕功能使用 PWA。请使用 HTTPS 部署以满足相关浏览器能力要求；当前 Service Worker 只缓存图标、清单等资源，**不提供完整的离线页面缓存**。
+
+更多静态托管、Nginx 与容器部署说明见 [DEPLOY.md](DEPLOY.md)。
+
+## 技术与代码导航
+
+Next.js 14 App Router · React 18 · TypeScript · Tailwind CSS · ECharts · SheetJS · IndexedDB
+
+| 目录 / 文件 | 作用 |
+| --- | --- |
+| [`app/`](app/) | 登录入口与各功能页面 |
+| [`components/`](components/) | 导航外壳、命令面板、导入流程、图表与基础控件 |
+| [`lib/local.ts`](lib/local.ts) / [`lib/local-core.ts`](lib/local-core.ts) | 本机存储、账号与本地查询引擎 |
+| [`lib/supabase.ts`](lib/supabase.ts) | 沿用早期命名的数据访问门面，当前实现使用本地数据层 |
+| [`lib/ai.ts`](lib/ai.ts) / [`lib/lesson.ts`](lib/lesson.ts) | 可选 AI 调用、教案与 PPT 导出 |
+| [`lib/importer.ts`](lib/importer.ts) / [`lib/survey.ts`](lib/survey.ts) | Excel 与问卷数据解析 |
+| [`scripts/`](scripts/) | 图标、示例数据、静态预览与部署打包脚本 |
+| [`design-docs/`](design-docs/) | 设计文档存档；其中 Supabase 方案为早期设计，不是当前部署前置条件 |
+
+新增功能时，请同步维护导航定义、数据模型及导入 / 打印流程。提交问题时附上复现步骤、浏览器信息与脱敏后的输入，不要提交真实学生记录、照片、备份文件或接口密钥。
+
+## 许可证
+
+本项目采用 [MIT License](LICENSE)。
